@@ -5,10 +5,13 @@ goversion provides easy version checking and consistent
 serialization for distributed applications.
 
 # Formats
+
+```
 0.0.0        // major.minor.patch
 0.0.0-rc0    // release candidate
 0.0.0b0      // beta
 0.0.0-rc0b0  // rc + beta
+```
 
 # Example
 
