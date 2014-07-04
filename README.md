@@ -50,16 +50,13 @@ func track(version string) {
 		}
 	}
 
-	if v.IsRc() {
-		if v.RcIs(4) {
-			// do something
-		}
+	// Automatically checks if it is an Rc version
+	if v.RcIs(0) {
+		// do something
 	}
 
-	if v.isBeta() {
-		if v.BetaIs(22) {
-			// do something
-		}
+	if v.BetaIs(22) {
+		// do something
 	}
 }
 ```
