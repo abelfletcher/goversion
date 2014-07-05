@@ -67,7 +67,12 @@ func track(version string) {
 		}
 	}
 
-	// short hands
+	// These are the same
+	if v.Is("0.0.1") || v.Equals("0.0.1") {
+		// do something
+	}
+
+	// aliases
 	if v.Gte("2.3.4") && v.Lt("2.3.4-rc6b5") {
 		// do something
 	}
