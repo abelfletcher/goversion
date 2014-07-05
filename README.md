@@ -58,6 +58,19 @@ func track(version string) {
 	if v.BetaIs(22) {
 		// do something
 	}
+
+	if v.LessThanOrEqualTo("1.0.3-rc5") {
+		// do something
+	} else {
+		if v.GreaterThan("0.9.4") {
+			// do something else
+		}
+	}
+
+	// short hands
+	if v.Gte("2.3.4") && v.Lt("2.3.4-rc6b5") {
+		// do something
+	}
 }
 ```
 
