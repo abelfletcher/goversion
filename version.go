@@ -23,6 +23,205 @@ func VERSION(version string) *Version {
 	return deserialize(version)
 }
 
+// Is compares the current version to a known version
+func(v *Version) Is(version string) bool {
+	v1 := VERSION(version)
+	if v.major != v1.major {
+		return false
+	}
+
+	if v.minor != v1.minor {
+		return false
+	}
+
+	if v.patch != v1.patch {
+		return false
+	}
+
+	if v.hasRc != v1.hasRc {
+		return false
+	}
+
+	if v.rc != v1.rc {
+		return false
+	}
+
+	if v.hasBeta != v1.hasBeta {
+		return false
+	}
+
+	if v.beta != v1.beta {
+		return false
+	}
+
+	return true
+}
+
+// Equals aliases Is()
+func(v *Version) Equals(version string) bool {
+	return v.Is(version)
+}
+
+// LessThan compares current version to known version
+func(v *Version) LessThan(version string) bool {
+	v1 := VERSION(version)
+
+	if v.major < v1.major {
+		return true
+	}
+
+	if v.major == v1.major {
+		if v.minor < v1.minor {
+			return true
+		}
+
+		if v.minor == v1.minor {
+			if v.patch < v1.patch {
+				return true
+			}
+
+			if v.patch == v1.patch {
+				if v.hasRc {
+					if v1.hasRc {
+						if v.rc < v1.rc {
+							return true
+						}
+
+						if v.rc == v1.rc {
+							if v.hasBeta {
+								if v1.hasBeta {
+									if v.beta < v1.beta {
+										return true
+									}
+								}
+							} else {
+								if v1.hasBeta {
+									return true
+								}
+							}
+						}
+					}
+				} else {
+					if v1.hasRc {
+						return true
+					}
+
+					if v.hasBeta {
+						if v1.hasBeta {
+							if v.beta < v1.beta {
+								return true
+							}
+						}
+					} else {
+						if v1.hasBeta {
+							return true
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// Lt aliases LessThan
+func(v *Version) Lt(version string) bool {
+	return v.LessThan(version)
+}
+
+// LessThanOrEqualTo compares current version to known version
+func(v *Version) LessThanOrEqualTo(version string) bool {
+	if v.Is(version) || v.LessThan(version) {
+		return true
+	}
+
+	return false
+}
+
+// Lte aliases LessThanOrEqualTo
+func(v *Version) Lte(version string) bool {
+	return v.LessThanOrEqualTo(version)
+}
+
+// GreaterThan compares current version to known version
+func(v *Version) GreaterThan(version string) bool {
+	v1 := VERSION(version)
+
+	if v.major > v1.major {
+		return true
+	}
+
+	if v.major == v1.major {
+		if v.minor > v1.minor {
+			return true
+		}
+
+		if v.minor == v1.minor {
+			if v.patch > v1.patch {
+				return true
+			}
+
+			if v.patch == v1.patch {
+				if v.hasRc {
+					if v1.hasRc {
+						if v.rc > v1.rc {
+							return true
+						}
+
+						if v.rc == v1.rc {
+							if v.hasBeta {
+								if v1.hasBeta {
+									if v.beta > v1.beta {
+										return true
+									}
+								} else {
+									return true
+								}
+							}
+						}
+					} else {
+						return true
+					}
+				} else {
+					if !v1.hasRc {
+						if v.hasBeta {
+							if v1.hasBeta {
+								if v.beta > v1.beta {
+									return true
+								}
+							} else {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// Gt aliases GreaterThan
+func(v *Version) Gt(version string) bool {
+	return v.GreaterThan(version)
+}
+
+// GreaterThanOrEqualTo compares current to known version
+func(v *Version) GreaterThanOrEqualTo(version string) bool {
+	if v.Is(version) || v.GreaterThan(version) {
+		return true
+	}
+
+	return false
+}
+
+// Gte aliases GreaterThanOrEqualTo
+func(v *Version) Gte(version string) bool {
+	return v.GreaterThanOrEqualTo(version)
+}
+
 // Major returns the major version component
 func(v *Version) Major() VersionComponent {
 	return v.major
