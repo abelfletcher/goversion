@@ -10,11 +10,11 @@ type Version struct {
 	major VersionComponent
 	minor VersionComponent
 	patch VersionComponent
-	rc VersionComponent
-	beta VersionComponent
+	rc    VersionComponent
+	beta  VersionComponent
 
-	hasRc bool
-	hasBeta bool
+	hasRc      bool
+	hasBeta    bool
 	serialized string
 }
 
@@ -24,7 +24,7 @@ func VERSION(version string) *Version {
 }
 
 // Is compares the current version to a known version
-func(v *Version) Is(version string) bool {
+func (v *Version) Is(version string) bool {
 	v1 := VERSION(version)
 	if v.major != v1.major {
 		return false
@@ -58,12 +58,12 @@ func(v *Version) Is(version string) bool {
 }
 
 // Equals aliases Is()
-func(v *Version) Equals(version string) bool {
+func (v *Version) Equals(version string) bool {
 	return v.Is(version)
 }
 
 // LessThan compares current version to known version
-func(v *Version) LessThan(version string) bool {
+func (v *Version) LessThan(version string) bool {
 	v1 := VERSION(version)
 
 	if v.major < v1.major {
@@ -126,12 +126,12 @@ func(v *Version) LessThan(version string) bool {
 }
 
 // Lt aliases LessThan
-func(v *Version) Lt(version string) bool {
+func (v *Version) Lt(version string) bool {
 	return v.LessThan(version)
 }
 
 // LessThanOrEqualTo compares current version to known version
-func(v *Version) LessThanOrEqualTo(version string) bool {
+func (v *Version) LessThanOrEqualTo(version string) bool {
 	if v.Is(version) || v.LessThan(version) {
 		return true
 	}
@@ -140,12 +140,12 @@ func(v *Version) LessThanOrEqualTo(version string) bool {
 }
 
 // Lte aliases LessThanOrEqualTo
-func(v *Version) Lte(version string) bool {
+func (v *Version) Lte(version string) bool {
 	return v.LessThanOrEqualTo(version)
 }
 
 // GreaterThan compares current version to known version
-func(v *Version) GreaterThan(version string) bool {
+func (v *Version) GreaterThan(version string) bool {
 	v1 := VERSION(version)
 
 	if v.major > v1.major {
@@ -204,12 +204,12 @@ func(v *Version) GreaterThan(version string) bool {
 }
 
 // Gt aliases GreaterThan
-func(v *Version) Gt(version string) bool {
+func (v *Version) Gt(version string) bool {
 	return v.GreaterThan(version)
 }
 
 // GreaterThanOrEqualTo compares current to known version
-func(v *Version) GreaterThanOrEqualTo(version string) bool {
+func (v *Version) GreaterThanOrEqualTo(version string) bool {
 	if v.Is(version) || v.GreaterThan(version) {
 		return true
 	}
@@ -218,17 +218,17 @@ func(v *Version) GreaterThanOrEqualTo(version string) bool {
 }
 
 // Gte aliases GreaterThanOrEqualTo
-func(v *Version) Gte(version string) bool {
+func (v *Version) Gte(version string) bool {
 	return v.GreaterThanOrEqualTo(version)
 }
 
 // Major returns the major version component
-func(v *Version) Major() VersionComponent {
+func (v *Version) Major() VersionComponent {
 	return v.major
 }
 
 // MajorIs compares the major version to a known version
-func(v *Version) MajorIs(what int) bool {
+func (v *Version) MajorIs(what int) bool {
 	if VersionComponent(what) == v.major {
 		return true
 	}
@@ -237,12 +237,12 @@ func(v *Version) MajorIs(what int) bool {
 }
 
 // Minor returns the minor version component
-func(v *Version) Minor() VersionComponent {
+func (v *Version) Minor() VersionComponent {
 	return v.minor
 }
 
 // MinorIs compares the minor version to a known version
-func(v *Version) MinorIs(what int) bool {
+func (v *Version) MinorIs(what int) bool {
 	if VersionComponent(what) == v.minor {
 		return true
 	}
@@ -251,12 +251,12 @@ func(v *Version) MinorIs(what int) bool {
 }
 
 // Patch returns the patch version component
-func(v *Version) Patch() VersionComponent {
+func (v *Version) Patch() VersionComponent {
 	return v.patch
 }
 
 // PatchIs compares the patch versiont to a known version
-func(v *Version) PatchIs(what int) bool {
+func (v *Version) PatchIs(what int) bool {
 	if VersionComponent(what) == v.patch {
 		return true
 	}
@@ -265,17 +265,17 @@ func(v *Version) PatchIs(what int) bool {
 }
 
 // IsRc returns whether or not this is an rc version
-func(v *Version) IsRc() bool {
+func (v *Version) IsRc() bool {
 	return v.hasRc
 }
 
 // Rc returns the release candidate component
-func(v *Version) Rc() VersionComponent {
+func (v *Version) Rc() VersionComponent {
 	return v.rc
 }
 
 // RcIs compares the rc version to a known version
-func(v *Version) RcIs(what int) bool {
+func (v *Version) RcIs(what int) bool {
 	if v.hasRc {
 		if VersionComponent(what) == v.rc {
 			return true
@@ -286,17 +286,17 @@ func(v *Version) RcIs(what int) bool {
 }
 
 // IsBeta returns whether or not this is a beta version
-func(v *Version) IsBeta() bool {
+func (v *Version) IsBeta() bool {
 	return v.hasBeta
 }
 
 // Beta returns the beta component
-func(v *Version) Beta() VersionComponent {
+func (v *Version) Beta() VersionComponent {
 	return v.beta
 }
 
 // BetaIs compares the beta version to a known version
-func(v *Version) BetaIs(what int) bool {
+func (v *Version) BetaIs(what int) bool {
 	if v.hasBeta {
 		if VersionComponent(what) == v.beta {
 			return true
@@ -307,7 +307,7 @@ func(v *Version) BetaIs(what int) bool {
 }
 
 // String returns the full version string
-func(v *Version) String() string {
+func (v *Version) String() string {
 	if len(v.serialized) == 0 {
 		v.serialized = serialize(v)
 	}
@@ -317,15 +317,15 @@ func(v *Version) String() string {
 
 // serialize returns a string serialization
 func serialize(v *Version) string {
-	s := v.Major().String()+"."+v.Minor().String()+
-		"."+v.Patch().String()
+	s := v.Major().String() + "." + v.Minor().String() +
+		"." + v.Patch().String()
 
 	if v.hasRc {
-		s += "-rc"+v.Rc().String()
+		s += "-rc" + v.Rc().String()
 	}
 
 	if v.hasBeta {
-		s += "b"+v.Beta().String()
+		s += "b" + v.Beta().String()
 	}
 
 	return s
@@ -425,51 +425,51 @@ func deserialize(vs string) *Version {
 type VersionComponent uint64
 
 // Return the component as string
-func(v VersionComponent) String() string {
+func (v VersionComponent) String() string {
 	return strconv.FormatUint(v.Uint64(), 10)
 }
 
 // Return the component as uint8
-func(v VersionComponent) Uint8() uint8 {
+func (v VersionComponent) Uint8() uint8 {
 	return uint8(v)
 }
 
 // Return the component as uint16
-func(v VersionComponent) Uint16() uint16 {
+func (v VersionComponent) Uint16() uint16 {
 	return uint16(v)
 }
 
 // Return the component as uint32
-func(v VersionComponent) Uint32() uint32 {
+func (v VersionComponent) Uint32() uint32 {
 	return uint32(v)
 }
 
 // Return the component as uint64
-func(v VersionComponent) Uint64() uint64 {
+func (v VersionComponent) Uint64() uint64 {
 	return uint64(v)
 }
 
 // Return the component as int8
-func(v VersionComponent) Int8() int8 {
+func (v VersionComponent) Int8() int8 {
 	return int8(v)
 }
 
 // Return the component as int16
-func(v VersionComponent) Int16() int16 {
+func (v VersionComponent) Int16() int16 {
 	return int16(v)
 }
 
 // Return the component as int32
-func(v VersionComponent) Int32() int32 {
+func (v VersionComponent) Int32() int32 {
 	return int32(v)
 }
 
 // Return the component as int64
-func(v VersionComponent) Int64() int64 {
+func (v VersionComponent) Int64() int64 {
 	return int64(v)
 }
 
 // Return the component as int
-func(v VersionComponent) Int() int {
+func (v VersionComponent) Int() int {
 	return int(v)
 }

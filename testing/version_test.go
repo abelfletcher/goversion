@@ -1,24 +1,24 @@
 package test
 
 import (
-	"testing"
 	"fmt"
 	v "github.com/abelfletcher/goversion"
 	"strconv"
+	"testing"
 )
 
 func TestParsing(t *testing.T) {
 	newVersion := func(maj int, min int, pat int,
 		hrc bool, rc int, hb bool, beta int) *v.Version {
 		s := ""
-		s += strconv.Itoa(maj)+"."+strconv.Itoa(min)+"."+strconv.Itoa(pat)
+		s += strconv.Itoa(maj) + "." + strconv.Itoa(min) + "." + strconv.Itoa(pat)
 
 		if hrc {
-			s += "-rc"+strconv.Itoa(rc)
+			s += "-rc" + strconv.Itoa(rc)
 		}
 
 		if hb {
-			s += "b"+strconv.Itoa(beta)
+			s += "b" + strconv.Itoa(beta)
 		}
 
 		return v.VERSION(s)
@@ -83,12 +83,12 @@ func TestParsing(t *testing.T) {
 		version := v.VERSION(s)
 
 		if !test(version, ver) {
-			fmt.Println(s+" not parsed correctly")
+			fmt.Println(s + " not parsed correctly")
 			t.Fail()
 		} else {
 			if version.String() != s {
-				fmt.Println(version.String()+" output from String()")
-				fmt.Println(s+" output from s")
+				fmt.Println(version.String() + " output from String()")
+				fmt.Println(s + " output from s")
 				fmt.Println("-")
 				t.Fail()
 			}
@@ -99,11 +99,10 @@ func TestParsing(t *testing.T) {
 			t.Fail()
 		}
 
-
 	}
 }
 
-func test(cases map[string]map[string]bool,tester func(*v.Version, string, bool)) {
+func test(cases map[string]map[string]bool, tester func(*v.Version, string, bool)) {
 	for verstr, c := range cases {
 		version := v.VERSION(verstr)
 		for ver, accepted := range c {
@@ -156,7 +155,7 @@ func TestLessThan(t *testing.T) {
 	test(ltVersions, func(v1 *v.Version, against string, accepted bool) {
 		if v1.Lt(against) != accepted {
 			t.Fail()
-			fmt.Println("Lt check failed. "+v1.String()+", "+against)
+			fmt.Println("Lt check failed. " + v1.String() + ", " + against)
 		}
 	})
 }
@@ -202,7 +201,7 @@ func TestLessThanOrEqualTo(t *testing.T) {
 	test(lteVersions, func(v1 *v.Version, against string, accepted bool) {
 		if v1.Lte(against) != accepted {
 			t.Fail()
-			fmt.Println("Lte check failed. "+v1.String()+", "+against)
+			fmt.Println("Lte check failed. " + v1.String() + ", " + against)
 		}
 	})
 }
@@ -250,7 +249,7 @@ func TestGreaterThan(t *testing.T) {
 	test(gtVersions, func(v1 *v.Version, against string, accepted bool) {
 		if v1.Gt(against) != accepted {
 			t.Fail()
-			fmt.Println("Gt check failed. "+v1.String()+", "+against)
+			fmt.Println("Gt check failed. " + v1.String() + ", " + against)
 		}
 	})
 }
@@ -297,7 +296,7 @@ func TestGreaterThanOrEqualTo(t *testing.T) {
 	test(gteVersions, func(v1 *v.Version, against string, accepted bool) {
 		if v1.Gte(against) != accepted {
 			t.Fail()
-			fmt.Println("Gte check failed. "+v1.String()+", "+against)
+			fmt.Println("Gte check failed. " + v1.String() + ", " + against)
 		}
 	})
 }
