@@ -7,11 +7,11 @@ import (
 
 // Version is stored in the application's VERSION var
 type Version struct {
-	major VersionComponent
-	minor VersionComponent
-	patch VersionComponent
-	rc    VersionComponent
-	beta  VersionComponent
+	major Major
+	minor Minor
+	patch Patch
+	rc    Rc
+	beta  Beta
 
 	hasRc      bool
 	hasBeta    bool
@@ -23,18 +23,32 @@ func VERSION(version string) *Version {
 	return deserialize(version)
 }
 
+func NewVersion(version interface{}) *Version {
+	switch version.(type) {
+	case string:
+		return VERSION(version.(string))
+	case Version:
+		v := version.(Version)
+		return NewVersion(&v)
+	case *Version:
+		return NewVersion(version.(*Version).String())
+	}
+
+	return NewVersion("")
+}
+
 // Is compares the current version to a known version
-func (v *Version) Is(version string) bool {
-	v1 := VERSION(version)
-	if v.major != v1.major {
+func (v *Version) Is(version interface{}) bool {
+	v1 := NewVersion(version)
+	if !v.major.is(v1.major) {
 		return false
 	}
 
-	if v.minor != v1.minor {
+	if !v.minor.is(v1.minor) {
 		return false
 	}
 
-	if v.patch != v1.patch {
+	if !v.patch.is(v1.patch) {
 		return false
 	}
 
@@ -42,7 +56,7 @@ func (v *Version) Is(version string) bool {
 		return false
 	}
 
-	if v.rc != v1.rc {
+	if !v.rc.is(v1.rc) {
 		return false
 	}
 
@@ -50,7 +64,7 @@ func (v *Version) Is(version string) bool {
 		return false
 	}
 
-	if v.beta != v1.beta {
+	if !v.beta.is(v1.beta) {
 		return false
 	}
 
@@ -58,39 +72,39 @@ func (v *Version) Is(version string) bool {
 }
 
 // Equals aliases Is()
-func (v *Version) Equals(version string) bool {
+func (v *Version) Equals(version interface{}) bool {
 	return v.Is(version)
 }
 
 // LessThan compares current version to known version
-func (v *Version) LessThan(version string) bool {
-	v1 := VERSION(version)
+func (v *Version) LessThan(version interface{}) bool {
+	v1 := NewVersion(version)
 
-	if v.major < v1.major {
+	if v.major.less(v1.major) {
 		return true
 	}
 
-	if v.major == v1.major {
-		if v.minor < v1.minor {
+	if v.major.is(v1.major) {
+		if v.minor.less(v1.minor) {
 			return true
 		}
 
-		if v.minor == v1.minor {
-			if v.patch < v1.patch {
+		if v.minor.is(v1.minor) {
+			if v.patch.less(v1.patch) {
 				return true
 			}
 
-			if v.patch == v1.patch {
+			if v.patch.is(v1.patch) {
 				if v.hasRc {
 					if v1.hasRc {
-						if v.rc < v1.rc {
+						if v.rc.less(v1.rc) {
 							return true
 						}
 
-						if v.rc == v1.rc {
+						if v.rc.is(v1.rc) {
 							if v.hasBeta {
 								if v1.hasBeta {
-									if v.beta < v1.beta {
+									if v.beta.less(v1.beta) {
 										return true
 									}
 								}
@@ -108,7 +122,7 @@ func (v *Version) LessThan(version string) bool {
 
 					if v.hasBeta {
 						if v1.hasBeta {
-							if v.beta < v1.beta {
+							if v.beta.less(v1.beta) {
 								return true
 							}
 						}
@@ -126,12 +140,12 @@ func (v *Version) LessThan(version string) bool {
 }
 
 // Lt aliases LessThan
-func (v *Version) Lt(version string) bool {
+func (v *Version) Lt(version interface{}) bool {
 	return v.LessThan(version)
 }
 
 // LessThanOrEqualTo compares current version to known version
-func (v *Version) LessThanOrEqualTo(version string) bool {
+func (v *Version) LessThanOrEqualTo(version interface{}) bool {
 	if v.Is(version) || v.LessThan(version) {
 		return true
 	}
@@ -140,39 +154,39 @@ func (v *Version) LessThanOrEqualTo(version string) bool {
 }
 
 // Lte aliases LessThanOrEqualTo
-func (v *Version) Lte(version string) bool {
+func (v *Version) Lte(version interface{}) bool {
 	return v.LessThanOrEqualTo(version)
 }
 
 // GreaterThan compares current version to known version
-func (v *Version) GreaterThan(version string) bool {
-	v1 := VERSION(version)
+func (v *Version) GreaterThan(version interface{}) bool {
+	v1 := NewVersion(version)
 
-	if v.major > v1.major {
+	if v.major.greater(v1.major) {
 		return true
 	}
 
-	if v.major == v1.major {
-		if v.minor > v1.minor {
+	if v.major.is(v1.major) {
+		if v.minor.greater(v1.minor) {
 			return true
 		}
 
-		if v.minor == v1.minor {
-			if v.patch > v1.patch {
+		if v.minor.is(v1.minor) {
+			if v.patch.greater(v1.patch) {
 				return true
 			}
 
-			if v.patch == v1.patch {
+			if v.patch.is(v1.patch) {
 				if v.hasRc {
 					if v1.hasRc {
-						if v.rc > v1.rc {
+						if v.rc.greater(v1.rc) {
 							return true
 						}
 
-						if v.rc == v1.rc {
+						if v.rc.is(v1.rc) {
 							if v.hasBeta {
 								if v1.hasBeta {
-									if v.beta > v1.beta {
+									if v.beta.greater(v1.beta) {
 										return true
 									}
 								} else {
@@ -187,7 +201,7 @@ func (v *Version) GreaterThan(version string) bool {
 					if !v1.hasRc {
 						if v.hasBeta {
 							if v1.hasBeta {
-								if v.beta > v1.beta {
+								if v.beta.greater(v1.beta) {
 									return true
 								}
 							} else {
@@ -204,12 +218,12 @@ func (v *Version) GreaterThan(version string) bool {
 }
 
 // Gt aliases GreaterThan
-func (v *Version) Gt(version string) bool {
+func (v *Version) Gt(version interface{}) bool {
 	return v.GreaterThan(version)
 }
 
 // GreaterThanOrEqualTo compares current to known version
-func (v *Version) GreaterThanOrEqualTo(version string) bool {
+func (v *Version) GreaterThanOrEqualTo(version interface{}) bool {
 	if v.Is(version) || v.GreaterThan(version) {
 		return true
 	}
@@ -218,18 +232,18 @@ func (v *Version) GreaterThanOrEqualTo(version string) bool {
 }
 
 // Gte aliases GreaterThanOrEqualTo
-func (v *Version) Gte(version string) bool {
+func (v *Version) Gte(version interface{}) bool {
 	return v.GreaterThanOrEqualTo(version)
 }
 
 // Major returns the major version component
-func (v *Version) Major() VersionComponent {
+func (v *Version) Major() Major {
 	return v.major
 }
 
 // MajorIs compares the major version to a known version
 func (v *Version) MajorIs(what int) bool {
-	if VersionComponent(what) == v.major {
+	if VersionComponent(what) == v.major.VersionComponent {
 		return true
 	}
 
@@ -237,13 +251,13 @@ func (v *Version) MajorIs(what int) bool {
 }
 
 // Minor returns the minor version component
-func (v *Version) Minor() VersionComponent {
+func (v *Version) Minor() Minor {
 	return v.minor
 }
 
 // MinorIs compares the minor version to a known version
 func (v *Version) MinorIs(what int) bool {
-	if VersionComponent(what) == v.minor {
+	if VersionComponent(what) == v.minor.VersionComponent {
 		return true
 	}
 
@@ -251,13 +265,13 @@ func (v *Version) MinorIs(what int) bool {
 }
 
 // Patch returns the patch version component
-func (v *Version) Patch() VersionComponent {
+func (v *Version) Patch() Patch {
 	return v.patch
 }
 
 // PatchIs compares the patch versiont to a known version
 func (v *Version) PatchIs(what int) bool {
-	if VersionComponent(what) == v.patch {
+	if VersionComponent(what) == v.patch.VersionComponent {
 		return true
 	}
 
@@ -270,14 +284,14 @@ func (v *Version) IsRc() bool {
 }
 
 // Rc returns the release candidate component
-func (v *Version) Rc() VersionComponent {
+func (v *Version) Rc() Rc {
 	return v.rc
 }
 
 // RcIs compares the rc version to a known version
 func (v *Version) RcIs(what int) bool {
 	if v.hasRc {
-		if VersionComponent(what) == v.rc {
+		if VersionComponent(what) == v.rc.VersionComponent {
 			return true
 		}
 	}
@@ -291,14 +305,14 @@ func (v *Version) IsBeta() bool {
 }
 
 // Beta returns the beta component
-func (v *Version) Beta() VersionComponent {
+func (v *Version) Beta() Beta {
 	return v.beta
 }
 
 // BetaIs compares the beta version to a known version
 func (v *Version) BetaIs(what int) bool {
 	if v.hasBeta {
-		if VersionComponent(what) == v.beta {
+		if VersionComponent(what) == v.beta.VersionComponent {
 			return true
 		}
 	}
@@ -382,38 +396,38 @@ func deserialize(vs string) *Version {
 	}
 
 	if contains(".") {
-		set(&v.major, ".")
+		set(&v.major.VersionComponent, ".")
 
 		if contains(".") {
-			set(&v.minor, ".")
+			set(&v.minor.VersionComponent, ".")
 
 			if v.hasRc {
-				set(&v.patch, "-rc")
+				set(&v.patch.VersionComponent, "-rc")
 
 				if v.hasBeta {
-					set(&v.rc, "b")
-					set(&v.beta, "")
+					set(&v.rc.VersionComponent, "b")
+					set(&v.beta.VersionComponent, "")
 				} else {
-					set(&v.rc, "")
+					set(&v.rc.VersionComponent, "")
 				}
 			} else {
 				if v.hasBeta {
-					set(&v.patch, "b")
-					set(&v.beta, "")
+					set(&v.patch.VersionComponent, "b")
+					set(&v.beta.VersionComponent, "")
 				} else {
-					set(&v.patch, "")
+					set(&v.patch.VersionComponent, "")
 				}
 			}
 		} else {
-			v.minor = 0
-			v.patch = 0
+			v.minor.VersionComponent = 0
+			v.patch.VersionComponent = 0
 			v.hasRc = false
 			v.hasBeta = false
 		}
 	} else {
-		v.major = 0
-		v.minor = 0
-		v.patch = 0
+		v.major.VersionComponent = 0
+		v.minor.VersionComponent = 0
+		v.patch.VersionComponent = 0
 		v.hasRc = false
 		v.hasBeta = false
 	}
@@ -423,6 +437,20 @@ func deserialize(vs string) *Version {
 
 // VersionComponent tracks numerical values
 type VersionComponent uint64
+type Major struct{ VersionComponent }
+type Minor struct{ VersionComponent }
+type Patch struct{ VersionComponent }
+type Rc struct{ VersionComponent }
+type Beta struct{ VersionComponent }
+
+type vComponent interface {
+	Component() VersionComponent
+}
+
+// Returns self
+func (v VersionComponent) Component() VersionComponent {
+	return v
+}
 
 // Return the component as string
 func (v VersionComponent) String() string {
@@ -472,4 +500,28 @@ func (v VersionComponent) Int64() int64 {
 // Return the component as int
 func (v VersionComponent) Int() int {
 	return int(v)
+}
+
+func (v VersionComponent) less(what vComponent) bool {
+	if v < what.Component() {
+		return true
+	}
+
+	return false
+}
+
+func (v VersionComponent) is(what vComponent) bool {
+	if v == what.Component() {
+		return true
+	}
+
+	return false
+}
+
+func (v VersionComponent) greater(what vComponent) bool {
+	if v > what.Component() {
+		return true
+	}
+
+	return false
 }
